@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
               alignment: Alignment.center,
               child: ElevatedButton(
                   onPressed: () {
-                    print('버튼이 눌렸습니다.');
+                    debugPrint('버튼이 눌렸습니다.');
                   },
                   child: const Text('Text')),
             ),

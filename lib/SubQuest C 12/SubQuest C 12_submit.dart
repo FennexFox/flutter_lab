@@ -11,8 +11,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          leading: Icon(Icons.menu),
-          title: Text('플러터 앱 만들기'),
+          leading: const Icon(Icons.menu),
+          title: const Text('플러터 앱 만들기'),
           centerTitle: true,
           backgroundColor: Colors.blue,
         ),
@@ -38,22 +38,22 @@ class AppContent extends StatelessWidget {
             // DEBUG CONSOLE에 출력
             debugPrint('버튼이 눌렸습니다');
           },
-          child: Text('Text'),
+          child: const Text('Text'),
         ),
-        Padding(
-          padding: EdgeInsets.only(top: 30),
+        const Padding(
+          padding: const EdgeInsets.only(top: 30),
         ),
         Stack(
           alignment: Alignment.topLeft,
           children: [
             for (int i = 0; i < 5; i++)
-              Container(
-                width: 300 - (i * 60).toDouble(),
-                height: 300 - (i * 60).toDouble(),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blue, width: 5),
-                ),
+            Container(
+              width: 300 - (i * 60).toDouble(),
+              height: 300 - (i * 60).toDouble(),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.blue, width: 5),
               ),
+            ),
           ],
         ),
       ],
