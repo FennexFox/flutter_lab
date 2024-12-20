@@ -37,6 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   font_awesome_flutter: ^10.8.0
   intl: ^0.20.1
+  logo_n_spinner: ^0.1.8
 
 dev_dependencies:
   flutter_test:

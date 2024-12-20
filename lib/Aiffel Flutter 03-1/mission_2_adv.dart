@@ -4,12 +4,46 @@ void main() {
   runApp(const MyApp());
 }
 
-class Recipe {
+class BucketList {
+  static List<Product> bucektList = [];
+
+  static void add(Product argument) {
+    bucektList.add(argument);
+  }
+
+  static void clear() {
+    bucektList = [];
+  }
+
+  static Map<String, int> show() { // 추가기능 구현하기
+    Map<String, int> bucketListProcessed = {};
+
+    for (Product product in bucektList) {
+      bucketListProcessed.update(
+        product.name, (value) => value + product.price,
+        ifAbsent: () => product.price
+      );
+    }
+
+    return bucketListProcessed;
+  }
+}
+
+class Product {
   final String name;
   final IconData icon;
+  final int price;
 
-  Recipe(this.name) : icon = Icons.dining_sharp;
+  Product(this.name, this.price) : icon = Icons.dining_sharp;
+}
 
+ElevatedButton buildTextButton(BuildContext context, String text, String route) {
+  return ElevatedButton(
+    onPressed: () {
+      Navigator.pushNamed(context, route);
+    },
+    child: Text(text)
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -17,13 +51,11 @@ class MyApp extends StatelessWidget {
 
   @override Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: '/home',
+      initialRoute: '/Home',
       routes: {
-        '/home': (context) => HomeScreen(),
-        '/찰순대': (context) => const Recipe1(),
-        '/토종순대': (context) => const Recipe2(),
-        '/피순대': (cotnext) => const Recipe3(),
-        '/장바구니': (context) => const Checkout(),
+        '/Home': (context) => HomeScreen(),
+        '/RecipePage': (context) => const RecipePage(),
+        '/Cart': (context) => const Cart(),
       },
     );
   }
@@ -32,8 +64,8 @@ class MyApp extends StatelessWidget {
 class HomeScreen extends StatelessWidget{
   HomeScreen({super.key});
 
-  final List<Recipe> recipes = [
-    Recipe("찰순대"), Recipe("토종순대"), Recipe("피순대"),
+  final List<Product> recipes = [
+    Product("찰순대", 6000), Product("토종순대", 8000), Product("피순대", 7000),
   ];
 
   @override
@@ -55,7 +87,7 @@ class HomeScreen extends StatelessWidget{
               )
             ),
             onTap: () {
-              Navigator.pushNamed(context, '/${recipes[index].name}');
+              Navigator.pushNamed(context, '/RecipePage', arguments: recipes[index]);
             },
           );
         },
@@ -67,23 +99,25 @@ class HomeScreen extends StatelessWidget{
   }
 }
 
-class Recipe1 extends StatelessWidget {
-  const Recipe1({super.key});
+class RecipePage extends StatelessWidget {
+  const RecipePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    Product arg = ModalRoute.of(context)?.settings.arguments as Product;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Recipe 1'),
+        title: Text(arg.name),
       ),
       body: Center(
         child: Column(
           children: [
-            const Text('This is the Recipe 1 screen.'),
+            Text('This is the Recipe screen of ${arg.name}'),
             ElevatedButton(
-              onPressed: () {Navigator.pushNamed(context, "/장바구니", arguments: "찰순대");},
-              child: const Text("담기"),
-            )
+              onPressed: () {BucketList.add(arg);},
+              child: const Text("장바구니 담기")),
+            buildTextButton(context, "장바구니 가기", "/Cart"),
+            buildTextButton(context, "홈으로 나가기", "/Home"),
           ]
         ),
       ),
@@ -91,68 +125,37 @@ class Recipe1 extends StatelessWidget {
   }
 }
 
-class Recipe2 extends StatelessWidget {
-  const Recipe2({super.key});
+class Cart extends StatefulWidget {
+  const Cart({super.key});
+
+  @override
+  CartState createState() => CartState();
+}
+
+class CartState extends State<Cart> {
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Recipe 2'),
+        title: const Text("장바구니"),
       ),
       body: Center(
         child: Column(
           children: [
-            const Text('This is the Recipe 2 screen.'),
+            for (var entry in BucketList.show().entries)
+            Text("${entry.key}: ${entry.value}원"),
             ElevatedButton(
-              onPressed: () {Navigator.pushNamed(context, "/장바구니", arguments: "토종순대");},
-              child: const Text("담기"),
-            )
-          ]
+              onPressed: () {
+                setState(() {
+                  BucketList.clear();});
+                },
+              child: const Text("장바구니 비우기")
+            ),
+            buildTextButton(context, "홈으로 나가기", "/Home"),
+          ],
         ),
       ),
     );
   }
-}
-
-class Recipe3 extends StatelessWidget {
-  const Recipe3({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Recipe 3'),
-      ),
-      body: Center(
-        child: Column(
-          children: [
-            const Text('This is the Recipe 3 screen.'),
-            ElevatedButton(
-              onPressed: () {Navigator.pushNamed(context, "/장바구니", arguments: "피순대");},
-              child: const Text("담기"),
-            )
-          ]
-        ),
-      ),
-    );
-  }
-}
-
-class Checkout extends StatelessWidget {
-  const Checkout({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    String arg = ModalRoute.of(context)?.settings.arguments as String;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(arg),
-      ),
-      body: Center(
-        child: Text(arg),
-      ),
-    );
-  }
-
 }
