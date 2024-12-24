@@ -71,7 +71,7 @@ class DetailScreen extends StatelessWidget{
           crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const Text("This is DetailScreen."),
-              Text('Your input was: $arg'),
+              Text('Your input was: \n s$arg'),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 child:

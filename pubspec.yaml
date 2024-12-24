@@ -38,6 +38,7 @@ dependencies:
   font_awesome_flutter: ^10.8.0
   intl: ^0.20.1
   logo_n_spinner: ^0.1.8
+  analog_clock: ^0.1.1
 
 dev_dependencies:
   flutter_test:

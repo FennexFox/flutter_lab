@@ -39,7 +39,7 @@ class FirstState extends State<FirstPage> {
         leading: const Center(child: FaIcon(FontAwesomeIcons.cat)),
         title: const Text('First Page'),
         centerTitle: true,
-        ),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -65,9 +65,9 @@ class FirstState extends State<FirstPage> {
                 padding: const EdgeInsets.symmetric(vertical: 50),
                 child: GestureDetector(
                   child: const LogoandSpinner(
-                  imageAssets: 'images/고양이그럴싸.png',
-                  reverse: true,
-                  arcColor: Colors.brown,
+                    imageAssets: 'images/고양이그럴싸.png',
+                    reverse: true,
+                    arcColor: Colors.orange,
                   ),
                   onTap: () {
                     debugPrint(is_cat.toString());
@@ -117,7 +117,7 @@ class SecondState extends State<SecondPage> {
                   setState(() {
                     is_cat = !is_cat;
                   });
-                  Navigator.pushNamed(context, "/first", arguments: is_cat);
+                  Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(100, 50),
