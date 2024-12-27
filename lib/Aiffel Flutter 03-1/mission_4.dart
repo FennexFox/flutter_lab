@@ -11,9 +11,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "Mission 03-4: Navigator",
-      home: Navigator(pages: [
-        const MaterialPage(child: DetailScreen()),
-        const MaterialPage(child: HomeScreen()),
+      home: Navigator(pages: const [
+        MaterialPage(child: DetailScreen()),
+        MaterialPage(child: HomeScreen()),
         ],
         onPopPage: (route, result) => route.didPop(result),
         ),
