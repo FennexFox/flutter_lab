@@ -1,0 +1,114 @@
+{
+  "books": [
+    {
+      "title": "To Kill a Mockingbird",
+      "authors": ["Harper Lee"],
+      "publisher": "J. B. Lippincott & Co.",
+      "genres": ["Southern Gothic", "Bildungsroman"],
+      "reviews": [
+        {
+          "reviewerName": "Alice Johnson",
+          "rating": 5,
+          "comment": "A timeless classic that tackles important social issues."
+        },
+        {
+          "reviewerName": "Bob Smith",
+          "rating": 4,
+          "comment": "Powerful narrative, though some parts feel slow-paced."
+        }
+      ],
+      "isbn": "9780446310789",
+      "price": 12.99,
+      "pageCount": 281,
+      "publishDate": "1960-07-11T00:00:00Z"
+    },
+    {
+      "title": "1984",
+      "authors": ["George Orwell"],
+      "publisher": "Secker & Warburg",
+      "genres": ["Dystopian", "Political fiction", "Social science fiction"],
+      "reviews": [
+        {
+          "reviewerName": "Carol White",
+          "rating": 5,
+          "comment": "A chilling prophecy of a world gone wrong. More relevant than ever."
+        },
+        {
+          "reviewerName": "David Brown",
+          "rating": 5,
+          "comment": "Orwell's masterpiece. A must-read for everyone."
+        }
+      ],
+      "isbn": "9780451524935",
+      "price": 8.99,
+      "pageCount": 328,
+      "publishDate": "1949-06-08T00:00:00Z"
+    },
+    {
+      "title": "The Hitchhiker's Guide to the Galaxy",
+      "authors": ["Douglas Adams"],
+      "publisher": "Pan Books",
+      "genres": ["Science fiction", "Comedy"],
+      "reviews": [
+        {
+          "reviewerName": "Emma Davis",
+          "rating": 4,
+          "comment": "Hilarious and absurd. A fun read for sci-fi fans."
+        },
+        {
+          "reviewerName": "Frank Miller",
+          "rating": 5,
+          "comment": "Witty, imaginative, and thoroughly entertaining."
+        }
+      ],
+      "isbn": "9780345391803",
+      "price": 7.99,
+      "pageCount": 193,
+      "publishDate": "1979-10-12T00:00:00Z"
+    },
+    {
+      "title": "Pride and Prejudice",
+      "authors": ["Jane Austen"],
+      "publisher": "T. Egerton, Whitehall",
+      "genres": ["Classic Regency novel", "Romance novel"],
+      "reviews": [
+        {
+          "reviewerName": "Grace Lee",
+          "rating": 5,
+          "comment": "A timeless romance with sharp social commentary."
+        },
+        {
+          "reviewerName": "Henry Wilson",
+          "rating": 4,
+          "comment": "Austen's wit shines through, though the pacing can be slow for modern readers."
+        }
+      ],
+      "isbn": "9780141439518",
+      "price": 9.99,
+      "pageCount": 432,
+      "publishDate": "1813-01-28T00:00:00Z"
+    },
+    {
+      "title": "The Da Vinci Code",
+      "authors": ["Dan Brown"],
+      "publisher": "Doubleday",
+      "genres": ["Mystery", "Conspiracy fiction", "Thriller"],
+      "reviews": [
+        {
+          "reviewerName": "Irene Taylor",
+          "rating": 4,
+          "comment": "Fast-paced and intriguing, even if some historical aspects are debatable."
+        },
+        {
+          "reviewerName": "Jack Robinson",
+          "rating": 3,
+          "comment": "Engaging plot, but the writing style isn't for everyone."
+        }
+      ],
+      "isbn": "9780385504201",
+      "price": 10.99,
+      "pageCount": 454,
+      "publishDate": "2003-03-18T00:00:00Z"
+    }
+  ]
+}

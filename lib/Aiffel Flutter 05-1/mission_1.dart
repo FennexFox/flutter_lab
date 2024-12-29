@@ -1,42 +1,31 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart' as path;
+import 'package:flutter/services.dart'  show rootBundle;
 import 'dart:convert';
 
-String jsonPath = path.join(Directory.current.path, 'assets/text', 'mission_1.json');
-File jsonString = File(jsonPath);
-var fileContent = jsonString.readAsStringSync();
-
 void main() {
-  runApp(const JsonExcercise());
+  runApp(const JsonExercise());
 }
 
-class JsonExcercise extends StatefulWidget {
-  const JsonExcercise({super.key});
+class JsonExercise extends StatefulWidget {
+  const JsonExercise({super.key});
 
   @override
   State<StatefulWidget> createState() {
-    return JsonExcerciseState();
+    return JsonExerciseState();
   }
 }
 
-class JsonExcerciseState extends State<JsonExcercise> {
-  late Map<String, dynamic> jsonMap;
+class JsonExerciseState extends State<JsonExercise> {
+  Map<String, dynamic>? jsonMap;
   String resultKeys = '';
   String resultValues = '';
-
-  @override
-  void initState() {
-    super.initState();
-    jsonMap = jsonDecode(fileContent);
-  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Mission 04-1: Json Excercise'),
+          title: const Text('Mission 05-1: Json Exercise'),
         ),
         body: Center(
           child: Column(
@@ -45,14 +34,22 @@ class JsonExcerciseState extends State<JsonExcercise> {
               Text(resultKeys),
               Text(resultValues),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  final String response = await rootBundle.loadString('assets/Aiffel_05/mission_1.json');
+                  final data = await json.decode(response) as Map<String, dynamic>;
                   setState(() {
-                    resultKeys = 'keys : ${jsonMap["user"]["address"].keys}';
-                    resultValues = 'values : ${jsonMap["user"]["address"].values}';
+                    jsonMap = data;
+                    if (jsonMap == null) {
+                      resultKeys = 'No data';
+                      resultValues = 'No data';
+                    } else {
+                      resultKeys = 'keys : ${jsonMap!["user"]["address"].keys}';
+                      resultValues = 'values : ${jsonMap!["user"]["address"].values}';
+                    }
                   });
                 },
                 child: const Text(
-                  'Adress Keys and Values',
+                  'Address Keys and Values',
                   textAlign: TextAlign.center,
                 )
               ),
