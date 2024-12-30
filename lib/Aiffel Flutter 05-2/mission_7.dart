@@ -33,6 +33,7 @@ class Mission7State extends State<Mission7> {
   final String apiUrl = "http://127.0.0.1:5000/mission/601";
   late String data1, data2, data3;
   Uint8List imageDecode = Uint8List(0);
+  XFile? selectedImage;  // 추가: 선택된 이미지 저장용 변수
 
   String getAdjustedUrl(String inputUrl) {
     try {
@@ -82,6 +83,65 @@ class Mission7State extends State<Mission7> {
     }
   }
 
+  Future<void> postImage() async {
+    if (selectedImage == null) {
+      setState(() {
+        result = "이미지를 선택해주세요";
+      });
+      return;
+    }
+
+    try {
+      final bytes = await selectedImage!.readAsBytes();
+      final base64Image = base64Encode(bytes);  // 단순화된 인코딩
+      
+      print("Sending image of size: ${bytes.length} bytes");  // 디버깅용
+      
+      final inputUrl = getAdjustedUrl(apiUrl);
+      final response = await http.post(
+        Uri.parse(inputUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': '69420',
+        },
+        body: jsonEncode({
+          'image': base64Image  // 'data' 래퍼 제거
+        }),
+      );
+
+      print("Response status: ${response.statusCode}");  // 디버깅용
+      print("Response body: ${response.body}");  // 디버깅용
+
+      if (response.statusCode == 200) {
+        final dynamic jsonResponse = jsonDecode(response.body);
+        final List<dynamic> data = jsonResponse['result'];
+        imageDecode = base64Decode(jsonResponse['image']);
+
+        data1 = "1st likely: ${data[0][0]} for ${double.parse(data[0][1]).toStringAsFixed(2)}";
+        data2 = "2nd likely: ${data[1][0]} for ${double.parse(data[1][1]).toStringAsFixed(2)}";
+        data3 = "3rd likely: ${data[2][0]} for ${double.parse(data[2][1]).toStringAsFixed(2)}";
+
+        setState(() {
+          result = "$data1\n$data2\n$data3";
+        });
+      } else {
+        setState(() {
+          result = "Failed to post image. Status Code: ${response.statusCode}";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        result = "Error: $e";
+      });
+    }
+  }
+
+  void onImageSelected(XFile? image) {
+    setState(() {
+      selectedImage = image;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,17 +159,17 @@ class Mission7State extends State<Mission7> {
             SizedBox(
               width: 256, height: 304,
               child: Center(
-                child: ImagePickerWidget(),
+                child: ImagePickerWidget(onImageSelected: onImageSelected),
               ),
             ),
             ElevatedButton(
-              onPressed: fetchData,
-              child: Text("이미지 전송하기 (미구현)"),
+              onPressed: postImage,
+              child: Text("이미지 전송하기"),
             ),
-            ElevatedButton(
-              onPressed: fetchData,
-              child: Text("품종 예측하기"),
-            ),
+            // ElevatedButton(
+            //   onPressed: fetchData,
+            //   child: Text("품종 예측하기"),
+            // ),
             SizedBox(height: 20),
             Text(
               result,
@@ -123,7 +183,12 @@ class Mission7State extends State<Mission7> {
 }
 
 class ImagePickerWidget extends StatefulWidget {
-  const ImagePickerWidget({super.key});
+  final Function(XFile?) onImageSelected;
+  
+  const ImagePickerWidget({
+    super.key,
+    required this.onImageSelected,
+  });
 
   @override
   ImagePickerWidgetState createState() => ImagePickerWidgetState();
@@ -137,6 +202,7 @@ class ImagePickerWidgetState extends State<ImagePickerWidget> {
     final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     setState(() {
       _image = pickedFile;
+      widget.onImageSelected(pickedFile);  // 추가: 상위 컴포넌트에 선택된 이미지 전달
     });
   }
 
