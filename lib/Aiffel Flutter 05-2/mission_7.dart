@@ -29,13 +29,14 @@ class Mission7 extends StatefulWidget {
 }
 
 class Mission7State extends State<Mission7> {
-  String result = "품종 예측 대기중";
   final String apiUrl = "http://127.0.0.1:5000/mission/601";
+  
+  String appStatusString = "Waiting user input...";
   late String data1, data2, data3;
   Uint8List imageDecode = Uint8List(0);
-  XFile? selectedImage;  // 추가: 선택된 이미지 저장용 변수
+  XFile? selectedImage;
 
-  String getAdjustedUrl(String inputUrl) {
+  String getAdjustedUrl(String inputUrl) { // adjust Localhost for Android Emulator
     try {
       if (Platform.isAndroid) {
         return inputUrl
@@ -44,94 +45,55 @@ class Mission7State extends State<Mission7> {
       }      
       return inputUrl;
     }
-    catch (e) {
+    catch (e) { // for other platforms that can't run 'Platform.isAndroid'
       return inputUrl;
     }
   }
 
-  Future<void> fetchData() async {
-    try {
-      final inputUrl = getAdjustedUrl(apiUrl);
-      final response = await http.get(
-        Uri.parse(inputUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': '69420', // used to bypass the ngrock free-acount warning page
-        },
-      );
-      if (response.statusCode == 200) {
-        final dynamic jsonResponse = jsonDecode(response.body);
-        final List<dynamic> data = jsonResponse['result'];
-        imageDecode = base64Decode(jsonResponse['image']);
-
-        data1 = "1st likely: ${data[0][0]} for ${double.parse(data[0][1]).toStringAsFixed(2)}";
-        data2 = "2nd likely: ${data[1][0]} for ${double.parse(data[1][1]).toStringAsFixed(2)}";
-        data3 = "3rd likely: ${data[2][0]} for ${double.parse(data[2][1]).toStringAsFixed(2)}";
-
-        setState(() {
-          result = "$data1 \n$data2 \n$data3";
-        });
-      } else {
-        setState(() {
-          result = "Failed to fetch data. Status Code: ${response.statusCode}";
-        });
-      }
-    } catch (e) {
+  void responseProcessor(http.Response response) {
+    if (response.statusCode == 200) {
+      final dynamic jsonResponse = jsonDecode(response.body);
+      final List<dynamic> data = jsonResponse['result'];
+      imageDecode = base64Decode(jsonResponse['image']);
+    
+      data1 = "1st likely: ${data[0][0]} for ${double.parse(data[0][1]).toStringAsFixed(2)}";
+      data2 = "2nd likely: ${data[1][0]} for ${double.parse(data[1][1]).toStringAsFixed(2)}";
+      data3 = "3rd likely: ${data[2][0]} for ${double.parse(data[2][1]).toStringAsFixed(2)}";
+    
       setState(() {
-        result = "Error: $e";
+        appStatusString = "$data1 \n$data2 \n$data3";
+      });
+    } else {
+      setState(() {
+        appStatusString = "Got response, failed to fetch data. Status Code: ${response.statusCode}";
       });
     }
   }
 
   Future<void> postImage() async {
-    if (selectedImage == null) {
-      setState(() {
-        result = "이미지를 선택해주세요";
-      });
-      return;
-    }
+    setState(() {
+      appStatusString = "Analyzing the image...";
+    });
 
     try {
       final bytes = await selectedImage!.readAsBytes();
-      final base64Image = base64Encode(bytes);  // 단순화된 인코딩
-      
-      print("Sending image of size: ${bytes.length} bytes");  // 디버깅용
-      
+      final base64Image = base64Encode(bytes);
       final inputUrl = getAdjustedUrl(apiUrl);
+
       final response = await http.post(
         Uri.parse(inputUrl),
         headers: {
           'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': '69420',
+          'ngrok-skip-browser-warning': '69420', // used to bypass the ngrock free-acount warning page
         },
         body: jsonEncode({
-          'image': base64Image  // 'data' 래퍼 제거
+          'image': base64Image,
         }),
       );
-
-      print("Response status: ${response.statusCode}");  // 디버깅용
-      print("Response body: ${response.body}");  // 디버깅용
-
-      if (response.statusCode == 200) {
-        final dynamic jsonResponse = jsonDecode(response.body);
-        final List<dynamic> data = jsonResponse['result'];
-        imageDecode = base64Decode(jsonResponse['image']);
-
-        data1 = "1st likely: ${data[0][0]} for ${double.parse(data[0][1]).toStringAsFixed(2)}";
-        data2 = "2nd likely: ${data[1][0]} for ${double.parse(data[1][1]).toStringAsFixed(2)}";
-        data3 = "3rd likely: ${data[2][0]} for ${double.parse(data[2][1]).toStringAsFixed(2)}";
-
-        setState(() {
-          result = "$data1\n$data2\n$data3";
-        });
-      } else {
-        setState(() {
-          result = "Failed to post image. Status Code: ${response.statusCode}";
-        });
-      }
+      responseProcessor(response);
     } catch (e) {
       setState(() {
-        result = "Error: $e";
+        appStatusString = "Error: $e";
       });
     }
   }
@@ -139,6 +101,7 @@ class Mission7State extends State<Mission7> {
   void onImageSelected(XFile? image) {
     setState(() {
       selectedImage = image;
+      appStatusString = "Post selected image to API";
     });
   }
 
@@ -157,22 +120,19 @@ class Mission7State extends State<Mission7> {
               textAlign: TextAlign.center,
             ),
             SizedBox(
-              width: 256, height: 304,
+              width: 256, height: 384,
               child: Center(
-                child: ImagePickerWidget(onImageSelected: onImageSelected),
+                child: ImagePickerWidget(
+                  onImageSelected: onImageSelected),
               ),
             ),
             ElevatedButton(
               onPressed: postImage,
-              child: Text("이미지 전송하기"),
+              child: Text("Post selected image"),
             ),
-            // ElevatedButton(
-            //   onPressed: fetchData,
-            //   child: Text("품종 예측하기"),
-            // ),
             SizedBox(height: 20),
             Text(
-              result,
+              appStatusString,
               style: TextStyle(fontSize: 15),
             ),
           ],
@@ -202,19 +162,21 @@ class ImagePickerWidgetState extends State<ImagePickerWidget> {
     final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     setState(() {
       _image = pickedFile;
-      widget.onImageSelected(pickedFile);  // 추가: 상위 컴포넌트에 선택된 이미지 전달
+      widget.onImageSelected(pickedFile);
     });
   }
 
   Widget getImageWidget() {
+    String returnText = "No image selected";
+
     try {
       if (_image == null) {
-        return Text("이미지를 선택해주세요.");
+        return Text(returnText);
       } else {
         return Image.file(File(_image!.path));
       }
     } catch (e) {
-      return Text("이미지를 선택해주세요.");
+      return Text(returnText);
     }
   }
 
@@ -226,7 +188,7 @@ class ImagePickerWidgetState extends State<ImagePickerWidget> {
         getImageWidget(),
         ElevatedButton(
           onPressed: pickImage,
-          child: Text("이미지 선택하기"),
+          child: Text("Select an image"),
         ),
       ],
     );
