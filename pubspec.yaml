@@ -45,6 +45,7 @@ dependencies:
   http: ^1.2.2
   image_picker: ^1.1.2
   build_runner: ^2.4.14
+  http_parser: ^4.1.1
 
 dev_dependencies:
   flutter_test:
