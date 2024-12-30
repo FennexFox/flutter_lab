@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 
 void main() {
   runApp(MyApp());
@@ -26,15 +29,28 @@ class Mission7 extends StatefulWidget {
 }
 
 class Mission7State extends State<Mission7> {
-  String result = "데이터 미입력";
+  String result = "품종 예측 대기중";
+  final String apiUrl = "http://127.0.0.1:5000/mission/601";
   late String data1, data2, data3;
   Uint8List imageDecode = Uint8List(0);
 
-  TextEditingController urlController = TextEditingController();
+  String getAdjustedUrl(String inputUrl) {
+    try {
+      if (Platform.isAndroid) {
+        return inputUrl
+            .replaceAll('localhost', '10.0.2.2')
+            .replaceAll('127.0.0.1', '10.0.2.2');
+      }      
+      return inputUrl;
+    }
+    catch (e) {
+      return inputUrl;
+    }
+  }
 
   Future<void> fetchData() async {
     try {
-      final inputUrl = urlController.text;
+      final inputUrl = getAdjustedUrl(apiUrl);
       final response = await http.get(
         Uri.parse(inputUrl),
         headers: {
@@ -52,7 +68,7 @@ class Mission7State extends State<Mission7> {
         data3 = "3rd likely: ${data[2][0]} for ${double.parse(data[2][1]).toStringAsFixed(2)}";
 
         setState(() {
-          result = "$data1 \n $data2 \n $data3";
+          result = "$data1 \n$data2 \n$data3";
         });
       } else {
         setState(() {
@@ -74,25 +90,79 @@ class Mission7State extends State<Mission7> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            TextField(
-              controller: urlController,
-              decoration: InputDecoration(labelText: "URL을 입력하세요"),
+            Text(
+              "API URL: \n $apiUrl",
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(
+              width: 256, height: 304,
+              child: Center(
+                child: ImagePickerWidget(),
+              ),
             ),
             ElevatedButton(
               onPressed: fetchData,
-              child: Text("품종 예측 가져오기"),
+              child: Text("이미지 전송하기 (미구현)"),
+            ),
+            ElevatedButton(
+              onPressed: fetchData,
+              child: Text("품종 예측하기"),
             ),
             SizedBox(height: 20),
-            Image.memory(imageDecode),
             Text(
               result,
-              style: TextStyle(fontSize: 18),
+              style: TextStyle(fontSize: 15),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class ImagePickerWidget extends StatefulWidget {
+  const ImagePickerWidget({super.key});
+
+  @override
+  ImagePickerWidgetState createState() => ImagePickerWidgetState();
+}
+
+class ImagePickerWidgetState extends State<ImagePickerWidget> {
+  final ImagePicker _picker = ImagePicker();
+  late XFile? _image;
+
+  Future<void> pickImage() async {
+    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      _image = pickedFile;
+    });
+  }
+
+  Widget getImageWidget() {
+    try {
+      if (_image == null) {
+        return Text("이미지를 선택해주세요.");
+      } else {
+        return Image.file(File(_image!.path));
+      }
+    } catch (e) {
+      return Text("이미지를 선택해주세요.");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: <Widget>[
+        getImageWidget(),
+        ElevatedButton(
+          onPressed: pickImage,
+          child: Text("이미지 선택하기"),
+        ),
+      ],
     );
   }
 }
